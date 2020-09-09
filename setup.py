@@ -11,7 +11,7 @@ setup(
     packages=['beancount_ce'],
     zip_safe=False,
     install_requires=[
-        'beancount>=2.1.3',
+        #'beancount>=2.1.3',
         'regex'
     ]
 )

@@ -8,6 +8,10 @@ setup(
     author='Arthur Findelair',
     author_email='arthfind@gmail.com',
     license='MIT',
-    packages=['beancount-ce'],
-    zip_safe=False
+    packages=['beancount_ce'],
+    zip_safe=False,
+    install_requires=[
+        'beancount>=2.1.3',
+        'regex'
+    ]
 )

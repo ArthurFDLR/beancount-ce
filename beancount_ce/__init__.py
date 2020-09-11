@@ -197,8 +197,6 @@ class CEImporter(importer.ImporterProtocol):
             else:
                 meta = data.new_metadata(file_.name, index)
             
-            
-
             amount = Decimal(op[6]) if isExpense else Decimal(op[5])
             currency = 'EUR'
             payee = op[4]

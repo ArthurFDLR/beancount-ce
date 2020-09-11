@@ -1,12 +1,8 @@
 import os
 from setuptools import setup
 
-with open(
-        os.path.join(os.path.dirname(__file__), 'README.md'),
-        'r',
-        newline='\n',
-        encoding='utf-8') as f:
-    long_description = f.read()
+with open('README.md', 'r') as fh:
+    long_description = fh.read()
 
 setup(
     name='beancount-ce',
@@ -22,8 +18,5 @@ setup(
     license='MIT',
     packages=['beancount_ce'],
     zip_safe=False,
-    install_requires=[
-        #'beancount>=2.1.3', #Cause error in venv installation
-        'regex'
-    ]
+    install_requires=['regex~=2020.7.14', 'beancount>=2.1.3', 'pdfminer.six']
 )

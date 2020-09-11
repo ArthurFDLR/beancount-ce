@@ -15,6 +15,14 @@ lint: lint-black lint-flake8
 
 # test
 
+pdf_to_txt:
+ifdef file
+		poetry run python beancount_ce/extract_statement.py $(file)
+else
+		@echo PDF Statement needed, try:
+		@echo     make pdf_to_txt file="url/to/pdf_statement.pdf"
+endif
+
 test-pytest:
 	poetry run pytest tests/
 

@@ -1,8 +1,6 @@
 __version__ = '0.1.0'
 
 from datetime import datetime
-from pdfminer.high_level import extract_text
-from pdfminer.layout import LAParams
 import regex
 from decimal import Decimal as D
 
@@ -11,31 +9,7 @@ from beancount.core.amount import Amount
 from beancount.core.number import Decimal
 from beancount.ingest import importer
 
-def extractText(pdf_file, outfile='-',
-            _py2_no_more_posargs=None,  # Bloody Python2 needs a shim
-            no_laparams=False, all_texts=None, detect_vertical=None, # LAParams
-            word_margin=None, char_margin=None, line_margin=None, boxes_flow=None, # LAParams
-            output_type='text', codec='utf-8', strip_control=False,
-            maxpages=0, page_numbers=None, password="", scale=1.0, rotation=0,
-            layoutmode='normal', output_dir=None, debug=False,
-            disable_caching=False, **other):
-    if _py2_no_more_posargs is not None:
-        raise ValueError("Too many positional arguments passed.")
-    if not pdf_file:
-        raise ValueError("Must provide files to work upon!")
-
-    # If any LAParams group arguments were passed, create an LAParams object and
-    # populate with given args. Otherwise, set it to None.
-    if not no_laparams:
-        laparams = LAParams()
-        for param in ("all_texts", "detect_vertical", "word_margin", "char_margin", "line_margin", "boxes_flow"):
-            paramv = locals().get(param, None)
-            if paramv is not None:
-                setattr(laparams, param, paramv)
-    else:
-        laparams = None
-    text = extract_text(pdf_file=pdf_file, laparams=laparams)
-    return text
+from .extract_statement import extractTextStatement
 
 def string_to_decimal(strD):
     # replace french separator by english one (otherwise there is a conversion syntax error)
@@ -69,17 +43,17 @@ emission_date_regex = r'\b(?P<date>[\d/]{10})\b'
 # -Réf. du mandat : FM-XXXXXXXX-X
 # [\S\s].*?
 debit_regex = (r'^'
-    '(?P<op_dte>\d\d\/\d\d)'                                        # date: dd/dd
-    '(?P<op_lbl>.*?)'                                               # label: any single character (.), between 0 and unlimited (*), lazy (?)
-    '\s.*?'                                                         # any whitespace and non-whitespace character (i.e. any character) ([\S\s]), any character (.) between 0 and unlimited (+), lazy
-    '(?P<op_amt>(?<=\s)\d{1,3}\s{1}\d{1,3}\,\d{2}|\d{1,3}\,\d{2}(?!([\S\s].*?((?<=(?=(^(?!(?1))\s.*(?1))))\s.*(?3)))))$'
+    r'(?P<op_dte>\d\d\/\d\d)'                                        # date: dd/dd
+    r'(?P<op_lbl>.*?)'                                               # label: any single character (.), between 0 and unlimited (*), lazy (?)
+    r'\s.*?'                                                         # any whitespace and non-whitespace character (i.e. any character) ([\S\s]), any character (.) between 0 and unlimited (+), lazy
+    r'(?P<op_amt>(?<=\s)\d{1,3}\s{1}\d{1,3}\,\d{2}|\d{1,3}\,\d{2}(?!([\S\s].*?((?<=(?=(^(?!(?1))\s.*(?1))))\s.*(?3)))))$'
                                                                     # amount: alternative between ddd ddd,dd and ddd,dd, until the end of line ($)
                                                                     # the positive lookebehind assures that there is at least one white space before any amount
                                                                     # the positive lookbehind handles the following case where amount to match is 4,45 and not 14,40:
                                                                     # 19/10 INTERETS TAEG 14,40
                                                                     # VALEUR AU 18/10     4,45
-    '\s*'                                                           # any whitespace character (\s), between 0 and unlimited (*), greedy
-    '(?P<op_lbl_extra>[\S\s]*?(?=^(?1)|^(?3)|\Z))'                  # extra label: 'single line mode' until the positive lookehead is satisfied
+    r'\s*'                                                           # any whitespace character (\s), between 0 and unlimited (*), greedy
+    r'(?P<op_lbl_extra>[\S\s]*?(?=^(?1)|^(?3)|\Z))'                  # extra label: 'single line mode' until the positive lookehead is satisfied
                                                                     # positive lookahead --> alternative between:
                                                                     #   -line starting with first named subpatern (date)
                                                                     #   -line starting with third named subpatern (amount)
@@ -99,11 +73,11 @@ debit_regex = (r'^'
 # -Réf. donneur d'ordre :
 # XXXXX/XX/XX-XXXX/XXXXXXXXX
 credit_regex = (r'^'
-    '(?P<op_amt>\d{1,3}\s{1}\d{1,3}\,\d{2}|\d{1,3}\,\d{2})'     # amount: alternative between ddd ddd,dd and ddd,dd
-    '(?P<op_dte>\d\d\/\d\d)'                                    # date: dd/dd
-    '(?P<op_lbl>.*)$'
-    '\s*'                                                       # any whitespace character (\s), between 0 and unlimited (*), greedy
-    '(?P<op_lbl_extra>[\S\s]*?(?=^(?1)|^(?2)|\Z))'              # extra label: 'single line mode' until the positive lookehead is satisfied
+    r'(?P<op_amt>\d{1,3}\s{1}\d{1,3}\,\d{2}|\d{1,3}\,\d{2})'     # amount: alternative between ddd ddd,dd and ddd,dd
+    r'(?P<op_dte>\d\d\/\d\d)'                                    # date: dd/dd
+    r'(?P<op_lbl>.*)$'
+    r'\s*'                                                       # any whitespace character (\s), between 0 and unlimited (*), greedy
+    r'(?P<op_lbl_extra>[\S\s]*?(?=^(?1)|^(?2)|\Z))'              # extra label: 'single line mode' until the positive lookehead is satisfied
                                                                 # positive lookahead --> alternative between:
                                                                 #   -line starting with first subpatern (amount)
                                                                 #   -line starting with second subpatern (date)
@@ -160,7 +134,7 @@ class CEImporter(importer.ImporterProtocol):
     def file_date(self, file_):
         if not self.identify(file_):
             return None
-        text = extractText(file_.name, char_margin = 120.0, word_margin = 1.0, line_margin = 0.3, boxes_flow = 0.5)
+        text = extractTextStatement(file_.name)
         return self._searchEmissionDate(text)
     
     def file_name(self, _):
@@ -168,15 +142,15 @@ class CEImporter(importer.ImporterProtocol):
 
     def identify(self, file_) -> bool:
         b = False
-        n = file_ if type(file_) == str else file_.name
 
-        if str(n).split('.')[-1].upper() == 'PDF':
-            try:
-                text = extractText(n, char_margin = 120.0, word_margin = 1.0, line_margin = 0.3, boxes_flow = 0.5)
-            except:
-                text = ''
-            if 'www.caisse-epargne.fr' in text:
-                b = True
+        try:
+            text = extractTextStatement(file_.name)
+        except:
+            text = ''
+
+        if 'www.caisse-epargne.fr' in text:
+            b = True
+        
         return b
 
     def extract(self, file_, existing_entries=None):
@@ -186,9 +160,9 @@ class CEImporter(importer.ImporterProtocol):
             return []
         
         if type(file_) == str:
-            text = extractText(file_, char_margin = 120.0, word_margin = 1.0, line_margin = 0.3, boxes_flow = 0.5)
+            text = extractTextStatement(file_)
         else:
-            text = extractText(file_.name, char_margin = 120.0, word_margin = 1.0, line_margin = 0.3, boxes_flow = 0.5)
+            text = extractTextStatement(file_.name)
         
         operations = self._getOperations(text)
 
@@ -477,7 +451,7 @@ class CEImporter(importer.ImporterProtocol):
         # parse date
         emission_date = datetime.strptime(
             emission_date, '%d/%m/%Y')
-        return emission_date
+        return emission_date.date()
 
     def _searchAccounts(self, statement):
         # get owner

@@ -16,7 +16,7 @@ setup(
     long_description_content_type='text/markdown',
     #url='git@github.com:ArthurFDLR/beancount-ce.git',
     url='https://github.com/ArthurFDLR/beancount-ce',
-    download_url='https://github.com/ArthurFDLR/beancount-ce/archive/v0.1.tar.gz'
+    download_url='https://github.com/ArthurFDLR/beancount-ce/archive/v0.1.tar.gz',
     author='Arthur Findelair',
     author_email='arthfind@gmail.com',
     license='MIT',

@@ -6,8 +6,8 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='beancount-ce',
-    version='0.1',
-    description="Beancount Importer for Caisse d'Epargne PDF statements exports",
+    version='1.0.0',
+    description="Beancount Importer for Caisse d'Epargne PDF statement exports",
     long_description=long_description,
     long_description_content_type='text/markdown',
     #url='git@github.com:ArthurFDLR/beancount-ce.git',

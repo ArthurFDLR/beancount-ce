@@ -1,3 +1,5 @@
+__version__ = '0.1.0'
+
 from datetime import datetime
 from pdfminer.high_level import extract_text
 from pdfminer.layout import LAParams

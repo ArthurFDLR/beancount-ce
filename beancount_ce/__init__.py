@@ -249,9 +249,6 @@ class CEImporter(importer.ImporterProtocol):
 
                 (statement, _, account) = statement.partition(full)
 
-                # search for last/new balances
-                (previous_balance, previous_balance_date) = self._search_previous_balance(account)
-                (new_balance, new_balance_date) = self._search_new_balance(account)
                 # create total for inconsistency check
                 total = D(0.0)
 
@@ -305,17 +302,6 @@ class CEImporter(importer.ImporterProtocol):
                     operations.append(self._create_operation_entry(op_date, emission_date,
                                                             full, op_label, creditLine, op_amount, False))
 
-                # check inconsistencies
-                if not ((previous_balance + total) == new_balance):
-                    print(account)
-                    print(
-                        '⚠️  inconsistency detected between imported operations and new balance')
-                    errors += 1
-                    print('previous_balance is {0}'.format(previous_balance))
-                    print('predicted new_balance is {0}'.format(
-                        previous_balance + total))
-                    print('new_balance should be {0}'.format(new_balance))
-        #print(operations)
         return operations
     
     def _create_operation_entry(self, op_date, statement_emission_date, account_number, op_label,
@@ -371,38 +357,6 @@ class CEImporter(importer.ImporterProtocol):
         else:
             emission = emission.replace(year=statement_emission_date.year - 1)
         return datetime.strftime(emission, '%d/%m/%Y')
-    
-    def _search_new_balance(self, account):
-        new_balance_amount = D(0.0)
-        new_balance_date = None
-        new_balance = regex.search(new_balance_regex, account, flags=regex.M)
-
-        # if the regex matched
-        if new_balance:
-            new_balance_date = new_balance.group('bal_dte').strip()
-            new_balance_amount = new_balance.group('bal_amt').strip()
-            new_balance_amount = string_to_decimal(new_balance_amount)
-
-        if not (new_balance_amount and new_balance_date):
-            print('⚠️  couldn\'t find a new balance for this account')
-        return (new_balance_amount, new_balance_date)
-
-    def _search_previous_balance(self,account):
-        previous_balance_amount = D(0.0)
-        previous_balance_date = None
-        # in the case of a new account (with no history) or a first statement...
-        # ...this regex won't match
-        previous_balance = regex.search(previous_balance_regex, account, flags=regex.M)
-
-        # if the regex matched
-        if previous_balance:
-            previous_balance_date = previous_balance.group('bal_dte').strip()
-            previous_balance_amount = previous_balance.group('bal_amt').strip()
-            previous_balance_amount = string_to_decimal(previous_balance_amount)
-
-        if not (previous_balance_amount and previous_balance_date):
-            print('⚠️  couldn\'t find a previous balance for this account')
-        return (previous_balance_amount, previous_balance_date)
     
     def _clean_account(self, account, account_number):
         # split the text by the 'new_balance_regex' line

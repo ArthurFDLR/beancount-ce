@@ -23,7 +23,7 @@ repository = "https://github.com/ArthurFDLR/beancount-ce"
 keywords = ["banking", "beancount", "cli-accounting", "finance"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.5"
 beancount = "2.3.0"
 "pdfminer.six" = "^20200726"
 regex = "^2020.7.14"

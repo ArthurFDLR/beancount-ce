@@ -1,4 +1,4 @@
-__version__ = '0.1.0'
+__version__ = '1.0.1'
 
 from datetime import datetime
 import regex
@@ -22,7 +22,7 @@ class CEImporter(importer.ImporterProtocol):
         creditCat (str, optional): Income category in beancount format (e.g. 'Income:FIXME'). Defaults to '', no income posting added to the operation.
         showOperationTypes (bool, optional): Show or not operation type (CARDDEBIT, WIRETRANSFER, CHECK ...) in header. Defaults to False.
     """
-    
+
     def __init__(
         self,
         iban:str,

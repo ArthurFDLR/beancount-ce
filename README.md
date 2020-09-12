@@ -15,13 +15,15 @@
 ## Usage
 
 ```python
+    IBAN_NUMBER_CE = 'FR00 1111 2222 3333 4444 5555 666'
+
     CONFIG = [
         CEImporter(
-            accountNumber=ACCOUNT_NUMBER,
+            iban=IBAN_NUMBER_CE,
             account='Assets:FR:CdE:CompteCourant',
-            expenseCat='Expenses:FIXME',
-            creditCat='Income:FIXME',
-            showOperationTypes=False
+            expenseCat='Expenses:FIXME',    #Optional
+            creditCat='Income:FIXME',       #Optional
+            showOperationTypes=False        #Optional
         ),
     ]
 ```

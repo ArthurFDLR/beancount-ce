@@ -1,3 +1,12 @@
+# build & publish
+
+build:
+	poetry build
+
+publish-pip:
+	poetry publish
+
+
 # formatting
 
 fmt-black:

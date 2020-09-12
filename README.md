@@ -1,9 +1,9 @@
 # Beancount Caisse d'Epargne Importer
 
-[![GitHub](https://img.shields.io/github/license/ArthurFDLR/beancount-ce)](https://github.com/ArthurFDLR/beancount-ce/blob/master/LICENSE)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ArthurFDLR/beancount-ce/beancount-ce)](https://github.com/ArthurFDLR/beancount-ce/actions)
 [![PyPI](https://img.shields.io/pypi/v/beancount-ce)](https://pypi.org/project/beancount-ce/)
-[![PyPI - Wheel](https://img.shields.io/pypi/v/beancount-ce)](https://pypi.org/project/beancount-ce/)
 [![PyPI - Version](https://img.shields.io/pypi/pyversions/beancount-ce.svg)](https://pypi.org/project/beancount-ce/)
+[![GitHub](https://img.shields.io/github/license/ArthurFDLR/beancount-ce)](https://github.com/ArthurFDLR/beancount-ce/blob/master/LICENSE.txt)
 [![Linting](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 `beancount-ce` provides a PDF statements importer for the bank [Caisse d'Epargne](http://www.caisse-epargne.fr) to the [Beancount](http://furius.ca/beancount/) format.

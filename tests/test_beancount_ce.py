@@ -7,7 +7,7 @@ from beancount.core.number import Decimal
 
 TEST_FILE_PATH = 'test_statement.txt'
 
-TEST_ACCOUNT_NUMBER = '12345 12345 12345678901'
+TEST_ACCOUNT_NUMBER = 'FR76 1234 5123 4512 3456 7890 130'
 TEST_DATE = datetime.date(2020, 5, 16)
 
 def test_version():

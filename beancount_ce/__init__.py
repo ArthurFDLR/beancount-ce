@@ -10,113 +10,28 @@ from beancount.core.number import Decimal
 from beancount.ingest import importer
 
 from .extract_statement import extractTextStatement
-
-def string_to_decimal(strD):
-    # replace french separator by english one (otherwise there is a conversion syntax error)
-    strD = strD.replace(',', '.')
-    # remove useless spaces
-    strD = strD.replace(' ', '')
-    # convert to decimal
-    nb = D(strD)
-    return nb
-
-
-## REGEX FORMATTING ##
-######################
-
-# - will match owner
-# prior to march 2019
-owner_regex_v1 = r'Identifiant client\s+(?P<owner>\D*)'
-# after march 2019
-owner_regex_v2 = r'^(?P<title>MR|MME|MLLE)\s+(?P<owner>\D*?)$'
-
-# - will match dates
-emission_date_regex = r'\b(?P<date>[\d/]{10})\b'
-
-# - will match debits
-# Ex 1.
-# 18/10 CB CENTRE LECLERC  FACT 161014      13,40
-# Ex 2.
-# 27/05 PRLV FREE MOBILE      3,99
-# -Réf. donneur d'ordre :
-# fmpmt-XXXXXXXX
-# -Réf. du mandat : FM-XXXXXXXX-X
-# [\S\s].*?
-debit_regex = (r'^'
-    r'(?P<op_dte>\d\d\/\d\d)'                                        # date: dd/dd
-    r'(?P<op_lbl>.*?)'                                               # label: any single character (.), between 0 and unlimited (*), lazy (?)
-    r'\s.*?'                                                         # any whitespace and non-whitespace character (i.e. any character) ([\S\s]), any character (.) between 0 and unlimited (+), lazy
-    r'(?P<op_amt>(?<=\s)\d{1,3}\s{1}\d{1,3}\,\d{2}|\d{1,3}\,\d{2}(?!([\S\s].*?((?<=(?=(^(?!(?1))\s.*(?1))))\s.*(?3)))))$'
-                                                                    # amount: alternative between ddd ddd,dd and ddd,dd, until the end of line ($)
-                                                                    # the positive lookebehind assures that there is at least one white space before any amount
-                                                                    # the positive lookbehind handles the following case where amount to match is 4,45 and not 14,40:
-                                                                    # 19/10 INTERETS TAEG 14,40
-                                                                    # VALEUR AU 18/10     4,45
-    r'\s*'                                                           # any whitespace character (\s), between 0 and unlimited (*), greedy
-    r'(?P<op_lbl_extra>[\S\s]*?(?=^(?1)|^(?3)|\Z))'                  # extra label: 'single line mode' until the positive lookehead is satisfied
-                                                                    # positive lookahead --> alternative between:
-                                                                    #   -line starting with first named subpatern (date)
-                                                                    #   -line starting with third named subpatern (amount)
-                                                                    #   -EOL
-                                                                    # we use [\s\S]*? to do like the single line mode
-                                                                    # basically it's going to match any non-whitespace OR whitespace character. That is, any character, including linebreaks.
-                                                                    # we could have used (?s) to activate the real line mode...
-                                                                    # ...but Python doesn't support mode-modified groups (meaning that it will change the mode for the whole regex)
-)
-
-# - will match credits
-# Ex 1.
-# 150,0008/11 VIREMENT PAR INTERNET
-# Ex 2.
-# 11,8011/02VIR SEPA LA MUTUELLE DES ETUDIA
-# XXXXX/XX/XX-XXXX/XXXXXXXXX
-# -Réf. donneur d'ordre :
-# XXXXX/XX/XX-XXXX/XXXXXXXXX
-credit_regex = (r'^'
-    r'(?P<op_amt>\d{1,3}\s{1}\d{1,3}\,\d{2}|\d{1,3}\,\d{2})'     # amount: alternative between ddd ddd,dd and ddd,dd
-    r'(?P<op_dte>\d\d\/\d\d)'                                    # date: dd/dd
-    r'(?P<op_lbl>.*)$'
-    r'\s*'                                                       # any whitespace character (\s), between 0 and unlimited (*), greedy
-    r'(?P<op_lbl_extra>[\S\s]*?(?=^(?1)|^(?2)|\Z))'              # extra label: 'single line mode' until the positive lookehead is satisfied
-                                                                # positive lookahead --> alternative between:
-                                                                #   -line starting with first subpatern (amount)
-                                                                #   -line starting with second subpatern (date)
-                                                                #   -EOL
-                                                                # we use [\s\S]*? to do like the single line mode
-                                                                # basically it's going to match any non-whitespace OR whitespace character. That is, any character, including linebreaks.
-                                                                # we could have used (?s) to activate the real line mode...
-                                                                # ...but Python doesn't support mode-modified groups (meaning that it will change the mode for the whole regex)
-)
-
-# - will match previous account balances (including date and balance)
-#   SOLDE PRECEDENT AU 15/10/14 56,05
-#   SOLDE PRECEDENT AU 15/10/14 1 575,00
-#   SOLDE PRECEDENT   0,00
-previous_balance_regex = r'SOLDE PRECEDENT AU (?P<bal_dte>\d\d\/\d\d\/\d\d)\s+(?P<bal_amt>[\d, ]+?)$'
-
-# - will match new account balances
-#   NOUVEAU SOLDE CREDITEUR AU 15/11/14 (en francs : 1 026,44) 156,48
-new_balance_regex = r'NOUVEAU SOLDE CREDITEUR AU (?P<bal_dte>\d\d\/\d\d\/\d\d)\s+\(en francs : (?P<bal_amt_fr>[\d, ]+)\)\s+(?P<bal_amt>[\d, ]+?)$'
-
-one_character_line_regex = r'^( +|.|\n)$'
-longer_than_70_regex = r'^(.{70,})$'
-smaller_than_2_regex = r'^.{,2}$'
-empty_line_regex = r'^(\s*)$'
-trailing_spaces_and_tabs_regex = r'[ \t]+$'
-line_return_regex = r'(\n)$'
-
-
+from .regex_formatter import *
 
 class CEImporter(importer.ImporterProtocol):
+    """[summary]
+
+    Attributes:
+        iban (str): International Bank Account Number of the account you want to extract operations. Note that only the account number is necessary
+        account (str): Account name in beancount format (e.g. 'Assets:FR:CdE:CompteCourant')
+        expenseCat (str, optional): Expense category in beancount format (e.g. 'Expenses:FIXME'). Defaults to '', no expense posting added to the operation.
+        creditCat (str, optional): Income category in beancount format (e.g. 'Income:FIXME'). Defaults to '', no income posting added to the operation.
+        showOperationTypes (bool, optional): Show or not operation type (CARDDEBIT, WIRETRANSFER, CHECK ...) in header. Defaults to False.
+    """
+    
     def __init__(
         self,
-        accountNumber: str,
-        account: str,
-        expenseCat: str = '',
+        iban:str,
+        account:str,
+        expenseCat:str = '',
         creditCat:str = '',
         showOperationTypes:bool = False
     ):
-        self.accountNumber = accountNumber.replace(' ', '')
+        self.iban = iban
         self.account = account
         self.expenseCat = expenseCat
         self.creditCat = creditCat
@@ -245,7 +160,7 @@ class CEImporter(importer.ImporterProtocol):
         operations = []
 
         for (full, account_number) in reversed(accounts):
-            if account_number == self.accountNumber:
+            if account_number.replace(' ', '') in self.iban.replace(' ', ''):
 
                 (statement, _, account) = statement.partition(full)
 
@@ -274,7 +189,9 @@ class CEImporter(importer.ImporterProtocol):
                     op_label_extra = debit_op.group('op_lbl_extra').strip()
                     op_amount = debit_op.group('op_amt').strip()
                     # convert amount to regular Decimal
-                    op_amount = string_to_decimal(op_amount)
+                    op_amount = op_amount.replace(',', '.')
+                    op_amount = op_amount.replace(' ', '')
+                    op_amount = D(op_amount)
                     # update total
                     total -= op_amount
                     # print('debit {0}'.format(op_amount))
@@ -294,7 +211,9 @@ class CEImporter(importer.ImporterProtocol):
                     creditLine = creditLine[len(op_amount) + len(op_date):]
 
                     # convert amount to regular Decimal
-                    op_amount = string_to_decimal(op_amount)
+                    op_amount = op_amount.replace(',', '.')
+                    op_amount = op_amount.replace(' ', '')
+                    op_amount = D(op_amount)
                     # update total
                     total += op_amount
                     # print('credit {0}'.format(op_amount))

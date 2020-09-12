@@ -34,7 +34,7 @@
 
 Feel free to contribute!
 
-Please make sure you have Python 3.5+ and [`Poetry`](https://poetry.eustace.io/) installed.
+Please make sure you have Python 3.6+ and [`Poetry`](https://poetry.eustace.io/) installed.
 
 1. Git clone the repository - `git clone https://github.com/siddhantgoel/beancount-n26`
 

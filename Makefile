@@ -10,17 +10,12 @@ publish-pip:
 # formatting
 
 fmt-black:
-	poetry run black beancount_n26/ tests/
+	poetry run black beancount_ce/ tests/
 
 # lint
 
-lint-black:
-	poetry run black --check beancount_n26/ tests/
-
-lint-flake8:
-	poetry run flake8 beancount_n26/ tests/
-
-lint: lint-black lint-flake8
+lint:
+	poetry run black --check beancount_ce/ tests/
 
 # test
 
@@ -32,7 +27,5 @@ else
 		@echo     make pdf_to_txt file="url/to/pdf_statement.pdf"
 endif
 
-test-pytest:
+test:
 	poetry run pytest tests/
-
-test: test-pytest

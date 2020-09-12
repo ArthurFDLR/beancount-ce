@@ -2,7 +2,6 @@ __version__ = '1.0.1'
 
 from datetime import datetime
 import regex
-from decimal import Decimal as D
 
 from beancount.core import data, flags
 from beancount.core.amount import Amount
@@ -177,7 +176,7 @@ class CEImporter(importer.ImporterProtocol):
                 (statement, _, account) = statement.partition(full)
 
                 # create total for inconsistency check
-                total = D(0.0)
+                total = Decimal(0.0)
 
                 # clean account to keep only operations
                 account = self._clean_account(account, full)
@@ -204,7 +203,7 @@ class CEImporter(importer.ImporterProtocol):
                     # convert amount to regular Decimal
                     op_amount = op_amount.replace(',', '.')
                     op_amount = op_amount.replace(' ', '')
-                    op_amount = D(op_amount)
+                    op_amount = Decimal(op_amount)
                     # update total
                     total -= op_amount
                     # print('debit {0}'.format(op_amount))
@@ -238,7 +237,7 @@ class CEImporter(importer.ImporterProtocol):
                     # convert amount to regular Decimal
                     op_amount = op_amount.replace(',', '.')
                     op_amount = op_amount.replace(' ', '')
-                    op_amount = D(op_amount)
+                    op_amount = Decimal(op_amount)
                     # update total
                     total += op_amount
                     # print('credit {0}'.format(op_amount))

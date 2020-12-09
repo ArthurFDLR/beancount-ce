@@ -57,15 +57,12 @@ class CEImporter(importer.ImporterProtocol):
 
     def identify(self, file_) -> bool:
         b = False
-
         try:
             text = extractTextStatement(file_.name)
+            if 'www.caisse-epargne.fr' in text:
+                b = True
         except:
-            text = ''
-
-        if 'www.caisse-epargne.fr' in text:
-            b = True
-
+            pass
         return b
 
     def extract(self, file_, existing_entries=None):

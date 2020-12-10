@@ -10,10 +10,10 @@ from beancount.ingest import importer
 
 from .extract_statement import extractTextStatement
 from .regex_formatter import *
-
+from .importer_csv import CEImporter_CSV
 
 class CEImporter(importer.ImporterProtocol):
-    """[summary]
+    """ Beancount Importer for Caisse d'Epargne PDF statement exports.
 
     Attributes:
         iban (str): International Bank Account Number of the account you want to extract operations. Note that only the account number is necessary

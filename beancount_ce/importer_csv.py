@@ -9,7 +9,7 @@ from beancount.ingest import importer
 
 
 class CEImporter_CSV(importer.ImporterProtocol):
-    """ Beancount Importer for Caisse d'Epargne PDF statement exports.
+    """ Beancount Importer for Caisse d'Epargne CSV statement exports.
 
     Attributes:
         account (str): Account name in beancount format (e.g. 'Assets:FR:CdE:CompteCourant')
@@ -18,10 +18,7 @@ class CEImporter_CSV(importer.ImporterProtocol):
     """
 
     def __init__(
-        self,
-        account: str,
-        expenseCat: str = '',
-        creditCat: str = '',
+        self, account: str, expenseCat: str = '', creditCat: str = '',
     ):
         self.account = account
         self.expenseCat = expenseCat
@@ -36,18 +33,13 @@ class CEImporter_CSV(importer.ImporterProtocol):
     def file_account(self, _):
         return self.account
 
-    def skip_last(iterator):
-        prev = next(iterator)
-        for item in iterator:
-            yield prev
-            prev = item
-
     def file_date(self, file_):
         if not self.identify(file_):
             return None
         date = None
         with open(file_.name) as fd:
-            for _ in range(4): next(fd)
+            for _ in range(4):
+                next(fd)
             reader = csv.DictReader(
                 fd, delimiter=';', quoting=csv.QUOTE_MINIMAL, quotechar='"'
             )
@@ -66,7 +58,14 @@ class CEImporter_CSV(importer.ImporterProtocol):
         return 'CaisseEpargne_Statement.csv'
 
     def is_valid_header(self, line: str) -> bool:
-        expected_values = ["Date", "Numéro d'opération", "Libellé", "Débit", "Crédit", "Détail"]
+        expected_values = [
+            "Date",
+            "Numéro d'opération",
+            "Libellé",
+            "Débit",
+            "Crédit",
+            "Détail",
+        ]
         actual_values = [column.strip('"') for column in line.split(';')]
         for (expected, actual) in zip(expected_values, actual_values):
             if expected != actual:
@@ -76,7 +75,8 @@ class CEImporter_CSV(importer.ImporterProtocol):
     def identify(self, file_) -> bool:
         try:
             with open(file_.name) as fd:
-                for _ in range(5): line = next(fd)
+                for _ in range(5):
+                    line = next(fd)
             return self.is_valid_header(line)
         except:
             return False
@@ -88,7 +88,8 @@ class CEImporter_CSV(importer.ImporterProtocol):
             return []
 
         with open(file_.name) as fd:
-            for _ in range(4): next(fd)
+            for _ in range(4):
+                next(fd)
             reader = csv.DictReader(
                 fd, delimiter=';', quoting=csv.QUOTE_MINIMAL, quotechar='"'
             )
@@ -100,8 +101,8 @@ class CEImporter_CSV(importer.ImporterProtocol):
                     date = datetime.strptime(line["Date"], '%d/%m/%y').date()
                 except:
                     break
-                if len(line["Débit"]) > 0 :
-                    amount = Decimal(line["Débit"].replace(',','.'))
+                if len(line["Débit"]) > 0:
+                    amount = Decimal(line["Débit"].replace(',', '.'))
                     postings.append(
                         data.Posting(
                             self.account,
@@ -124,8 +125,8 @@ class CEImporter_CSV(importer.ImporterProtocol):
                             )
                         )
 
-                if len(line["Crédit"]) > 0 :
-                    amount = Decimal(line["Crédit"].replace(',','.'))
+                if len(line["Crédit"]) > 0:
+                    amount = Decimal(line["Crédit"].replace(',', '.'))
                     postings.append(
                         data.Posting(
                             self.account,

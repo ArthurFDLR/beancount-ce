@@ -2,7 +2,7 @@ import pathlib
 import pytest
 import datetime
 
-from beancount_ce import __version__, CEImporter
+from beancount_ce import __version__, CEImporter, CEImporter_PDF
 from beancount.core.number import Decimal
 
 TEST_FILE_PATH = 'test_statement.txt'
@@ -12,7 +12,7 @@ TEST_DATE = datetime.date(2020, 5, 16)
 
 
 def test_version():
-    assert __version__ == '1.0.2'
+    assert __version__ == '1.0.3'
 
 
 @pytest.fixture

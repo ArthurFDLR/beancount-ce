@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "beancount-ce"
-version = "1.0.2"
-description = "Beancount Importer for Caisse d'Epargne PDF statement exports"
+version = "1.0.3"
+description = "Beancount statements (pdf and csv) importer for Caisse d'Epargne bank"
 readme = "README.md"
 authors = ["Arthur Findelair <arthfind@gmail.com>"]
 license = "MIT"
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Plugins",
     "Intended Audience :: End Users/Desktop",
     "Intended Audience :: Financial and Insurance Industry",

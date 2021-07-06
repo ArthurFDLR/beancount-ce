@@ -1,10 +1,10 @@
 # Beancount Caisse d'Epargne Importer
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ArthurFDLR/beancount-ce/beancount-ce)](https://github.com/ArthurFDLR/beancount-ce/actions)
-[![PyPI](https://img.shields.io/pypi/v/beancount-ce)](https://pypi.org/project/beancount-ce/)
-[![PyPI - Version](https://img.shields.io/pypi/pyversions/beancount-ce.svg)](https://pypi.org/project/beancount-ce/)
-[![GitHub](https://img.shields.io/github/license/ArthurFDLR/beancount-ce)](https://github.com/ArthurFDLR/beancount-ce/blob/master/LICENSE.txt)
-[![Linting](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ArthurFDLR/beancount-ce/beancount-ce?style=for-the-badge)](https://github.com/ArthurFDLR/beancount-ce/actions)
+[![PyPI](https://img.shields.io/pypi/v/beancount-ce?style=for-the-badge)](https://pypi.org/project/beancount-ce/)
+[![PyPI - Version](https://img.shields.io/pypi/pyversions/beancount-ce.svg?style=for-the-badge)](https://pypi.org/project/beancount-ce/)
+[![GitHub](https://img.shields.io/github/license/ArthurFDLR/beancount-ce?style=for-the-badge)](https://github.com/ArthurFDLR/beancount-ce/blob/master/LICENSE.txt)
+[![Linting](https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge)](https://github.com/psf/black)
 
 `beancount-ce` provides a statements (PDF and CSV) importer for the bank [Caisse d'Epargne](http://www.caisse-epargne.fr) to the [Beancount](http://furius.ca/beancount/) format.
 
@@ -15,6 +15,8 @@
 ```
 
 ## Usage
+
+Add ```CEImporter``` to your [Beancount importers config file](https://beancount.github.io/docs/importing_external_data.html#configuration).
 
 ```python
     IBAN_NUMBER_CE = 'FR00 1111 2222 3333 4444 5555 666'

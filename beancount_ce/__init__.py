@@ -40,6 +40,7 @@ class CEImporter(importer.ImporterProtocol):
                 account=self.account,
                 expenseCat=self.expenseCat,
                 creditCat=self.creditCat,
+                iban=self.iban,
             )
         if self.file_type in [0, 1]:
             self.pdf_importer = CEImporter_PDF(

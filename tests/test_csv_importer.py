@@ -30,6 +30,13 @@ def test_identify(importer, filename):
         assert importer.identify(fd)
 
 
+def test_identify_with_wrong_iban(filename):
+    with open(filename) as fd:
+        assert not CEImporter(
+            "FR76 XXXX XXXX XXXX XXXX XXXX XXX", 'Assets:CE'
+        ).identify(fd), 'File not skipped'
+
+
 def test_file_date(importer, filename):
     with open(filename) as fd:
         assert importer.file_date(fd) == TEST_DATE

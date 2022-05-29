@@ -11,7 +11,7 @@ from .regex_formatter import *
 
 
 class CEImporter_PDF(importer.ImporterProtocol):
-    """ Beancount Importer for Caisse d'Epargne PDF statement exports.
+    """Beancount Importer for Caisse d'Epargne PDF statement exports.
 
     Attributes:
         iban (str): International Bank Account Number of the account you want to extract operations. Note that only the account number is necessary

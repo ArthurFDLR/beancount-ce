@@ -7,7 +7,7 @@ from beancount.ingest import importer
 
 
 class CEImporter(importer.ImporterProtocol):
-    """ Beancount Importer for Caisse d'Epargne PDF and CSV statement.
+    """Beancount Importer for Caisse d'Epargne PDF and CSV statement.
 
     Attributes:
         iban (str): International Bank Account Number of the account you want to extract operations. Note that only the account number is necessary.

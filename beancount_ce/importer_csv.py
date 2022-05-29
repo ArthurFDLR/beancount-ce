@@ -9,7 +9,7 @@ from beancount.ingest import importer
 
 
 class CEImporter_CSV(importer.ImporterProtocol):
-    """ Beancount Importer for Caisse d'Epargne CSV statement exports.
+    """Beancount Importer for Caisse d'Epargne CSV statement exports.
 
     Attributes:
         account (str): Account name in beancount format (e.g. 'Assets:FR:CdE:CompteCourant')

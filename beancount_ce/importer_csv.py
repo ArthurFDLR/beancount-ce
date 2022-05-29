@@ -85,10 +85,10 @@ class CEImporter_CSV(importer.ImporterProtocol):
             [account_number_key, account_number] = [
                 token.strip() for token in line.split(';')[0].split(':')
             ]
-            return (
-                account_number_key == "Numéro de compte"
-                and account_number.replace(' ', '')
-                in self.iban.replace(' ', '')
+            return account_number_key == "Numéro de compte" and account_number.replace(
+                ' ', ''
+            ) in self.iban.replace(
+                ' ', ''
             )
         except:
             return False

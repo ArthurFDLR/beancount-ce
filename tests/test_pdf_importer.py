@@ -5,10 +5,10 @@ import datetime
 from beancount_ce import __version__, CEImporter
 from beancount.core.number import Decimal
 
-TEST_FILE_PATH = 'test_csv_importer_statement.csv'
+TEST_FILE_PATH = 'test_pdf_importer_statement.txt'
 
 TEST_ACCOUNT_NUMBER = 'FR76 1234 5123 4512 3456 7890 130'
-TEST_DATE = datetime.date(2020, 5, 15)
+TEST_DATE = datetime.date(2020, 5, 16)
 
 
 def test_version():
@@ -28,13 +28,6 @@ def importer():
 def test_identify(importer, filename):
     with open(filename) as fd:
         assert importer.identify(fd)
-
-
-def test_identify_with_wrong_iban(filename):
-    with open(filename) as fd:
-        assert not CEImporter(
-            "FR76 XXXX XXXX XXXX XXXX XXXX XXX", 'Assets:CE'
-        ).identify(fd), 'File not skipped'
 
 
 def test_file_date(importer, filename):

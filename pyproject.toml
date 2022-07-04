@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "beancount-ce"
-version = "1.0.4"
+version = "1.0.5"
 description = "Beancount statements (pdf and csv) importer for Caisse d'Epargne bank"
 readme = "README.md"
 authors = ["Arthur Findelair <arthfind@gmail.com>"]

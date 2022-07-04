@@ -113,7 +113,7 @@ class CEImporter_CSV(importer.ImporterProtocol):
                 header_line = next(fd)
             return self.is_valid_header(
                 header_line
-            ) # and self.is_valid_account_number_line(account_number_line)
+            )  # and self.is_valid_account_number_line(account_number_line)
         except:
             return False
 
@@ -133,7 +133,9 @@ class CEImporter_CSV(importer.ImporterProtocol):
                 meta = data.new_metadata(file_.name, index)
                 postings = []
                 try:
-                    date = datetime.strptime(line["Date operation"], '%Y-%m-%d').date()
+                    date = datetime.strptime(
+                        line["Date operation"], '%Y-%m-%d'
+                    ).date()
                 except:
                     break
                 amount = Decimal(line["Montant operation"].replace(',', '.'))
@@ -176,7 +178,10 @@ class CEImporter_CSV(importer.ImporterProtocol):
                         meta,
                         date,
                         self.FLAG,
-                        line["Libelle operation"] + " [" + line["Libelle simplifie"] + "]",
+                        line["Libelle operation"]
+                        + " ["
+                        + line["Libelle simplifie"]
+                        + "]",
                         '',
                         data.EMPTY_SET,
                         data.EMPTY_SET,

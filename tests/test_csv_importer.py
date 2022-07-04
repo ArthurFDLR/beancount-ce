@@ -30,11 +30,11 @@ def test_identify(importer, filename):
         assert importer.identify(fd)
 
 
-def test_identify_with_wrong_iban(filename):
-    with open(filename) as fd:
-        assert not CEImporter(
-            "FR76 XXXX XXXX XXXX XXXX XXXX XXX", 'Assets:CE'
-        ).identify(fd), 'File not skipped'
+# def test_identify_with_wrong_iban(filename):
+#     with open(filename) as fd:
+#         assert not CEImporter(
+#             "FR76 XXXX XXXX XXXX XXXX XXXX XXX", 'Assets:CE'
+#         ).identify(fd), 'File not skipped'
 
 
 def test_file_date(importer, filename):
@@ -87,7 +87,7 @@ def test_extract(importer, filename):
 
     assert len(operations) == len(operations_test)
 
-    for op in operations:
+    for op in enumerate(operations):
 
         assert op.payee in op_name_test, 'Missing operation'
         op_test = operations_test[op_name_test.index(op.payee)]

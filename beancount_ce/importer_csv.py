@@ -44,17 +44,18 @@ class CEImporter_CSV(importer.ImporterProtocol):
             return None
         date = None
         with open(file_.name) as fd:
-            for _ in range(4):
-                next(fd)
+            # for _ in range(4):
+            #     next(fd)
             reader = csv.DictReader(
                 fd, delimiter=';', quoting=csv.QUOTE_MINIMAL, quotechar='"'
             )
             for line in reader:
                 try:
                     date_tmp = datetime.strptime(
-                        line["Date"], '%d/%m/%y'
+                        line["Date operation"], '%Y-%m-%d'
                     ).date()
-                except:
+                except Exception as e:
+                    print(e)
                     break
                 if not date or date_tmp > date:
                     date = date_tmp
@@ -64,15 +65,24 @@ class CEImporter_CSV(importer.ImporterProtocol):
         return 'CaisseEpargne_Statement.csv'
 
     def is_valid_header(self, line: str) -> bool:
+        # expected_values = [
+        #     "Date",
+        #     "Numéro d'opération",
+        #     "Libellé",
+        #     "Débit",
+        #     "Crédit",
+        #     "Détail",
+        # ]
         expected_values = [
-            "Date",
-            "Numéro d'opération",
-            "Libellé",
-            "Débit",
-            "Crédit",
-            "Détail",
+            "Date operation",
+            "Date de comptabilisation",
+            "Categorie operation",
+            "Libelle operation",
+            "Libelle simplifie",
+            "Montant operation",
+            "Pointage operation",
         ]
-        actual_values = [column.strip('"') for column in line.split(';')]
+        actual_values = [column.strip('\n') for column in line.split(';')]
         for (expected, actual) in zip(expected_values, actual_values):
             if expected != actual:
                 return False
@@ -96,14 +106,14 @@ class CEImporter_CSV(importer.ImporterProtocol):
     def identify(self, file_) -> bool:
         try:
             with open(file_.name) as fd:
-                next(fd)
-                account_number_line = next(fd)
-                next(fd)
-                next(fd)
+                # next(fd)
+                # account_number_line = next(fd)
+                # next(fd)
+                # next(fd)
                 header_line = next(fd)
             return self.is_valid_header(
                 header_line
-            ) and self.is_valid_account_number_line(account_number_line)
+            ) # and self.is_valid_account_number_line(account_number_line)
         except:
             return False
 
@@ -114,31 +124,30 @@ class CEImporter_CSV(importer.ImporterProtocol):
             return []
 
         with open(file_.name) as fd:
-            for _ in range(4):
-                next(fd)
+            # for _ in range(4):
+            #     next(fd)
             reader = csv.DictReader(
                 fd, delimiter=';', quoting=csv.QUOTE_MINIMAL, quotechar='"'
             )
-
             for index, line in enumerate(reader):
                 meta = data.new_metadata(file_.name, index)
                 postings = []
                 try:
-                    date = datetime.strptime(line["Date"], '%d/%m/%y').date()
+                    date = datetime.strptime(line["Date operation"], '%Y-%m-%d').date()
                 except:
                     break
-                if len(line["Débit"]) > 0:
-                    amount = Decimal(line["Débit"].replace(',', '.'))
-                    postings.append(
-                        data.Posting(
-                            self.account,
-                            Amount(amount, 'EUR'),
-                            None,
-                            None,
-                            None,
-                            None,
-                        )
+                amount = Decimal(line["Montant operation"].replace(',', '.'))
+                postings.append(
+                    data.Posting(
+                        self.account,
+                        Amount(amount, 'EUR'),
+                        None,
+                        None,
+                        None,
+                        None,
                     )
+                )
+                if amount < 0:
                     if len(self.expenseCat) > 0:
                         postings.append(
                             data.Posting(
@@ -150,19 +159,7 @@ class CEImporter_CSV(importer.ImporterProtocol):
                                 None,
                             )
                         )
-
-                if len(line["Crédit"]) > 0:
-                    amount = Decimal(line["Crédit"].replace(',', '.'))
-                    postings.append(
-                        data.Posting(
-                            self.account,
-                            Amount(amount, 'EUR'),
-                            None,
-                            None,
-                            None,
-                            None,
-                        )
-                    )
+                else:
                     if len(self.creditCat) > 0:
                         postings.append(
                             data.Posting(
@@ -174,18 +171,16 @@ class CEImporter_CSV(importer.ImporterProtocol):
                                 None,
                             )
                         )
-
                 entries.append(
                     data.Transaction(
                         meta,
                         date,
                         self.FLAG,
-                        line["Libellé"],
+                        line["Libelle operation"] + " [" + line["Libelle simplifie"] + "]",
                         '',
                         data.EMPTY_SET,
                         data.EMPTY_SET,
                         postings,
                     )
                 )
-
         return entries

@@ -1,13 +1,8 @@
-Code de la banque : 12345;Code de l'agence : 12345;Date de début de téléchargement : 16/04/2020;Date de fin de téléchargement : 15/05/2020;
-Numéro de compte : 1234567890130;Nom du compte : CPT DEPOT PART.;Devise : EUR;
-
-Solde en fin de période;;;;325,42
-Date;Numéro d'opération;Libellé;Débit;Crédit;Détail;
-17/04/20;1111111111111111-11.11.11.111111 -;* OP DEBIT BANQUE;-14,90;;Des détails ;
-17/04/20;2222222222222222-22.22.22.222222 -;* OP CREDIT BANQUE;;+4,40;Des détails ;
-20/04/20;3333333333333333-33.33.33.333333 -;VIR SEPA ENTRANT;;+24,00;Des détails ;
-21/04/20;4444444444444444-44.44.44.444444 -;CB ACHAT 1;-63,43;;Des détails ;
-22/04/20;5555555555555555-55.55.55.555555 -;CB ACHAT 2;-63,11;;Des détails ;
-27/04/20;6666666666666666-66.66.66.666666 -;PRLV Prlvt 1;-20,00;;Des détails ;
-15/05/20;7777777777777777-77.77.77.777777 -;CB ACHAT 3;-7,32;;Des détails ;
-Solde en début de période;;;;185,06
+Date operation;Date de comptabilisation;Categorie operation;Libelle operation;Libelle simplifie;Montant operation;Pointage operation
+2020-04-17;2020-04-17;;* OP DEBIT BANQUE;;-14.90;0
+2020-04-17;2020-04-17;;* OP CREDIT BANQUE;;+4.40;0
+2020-04-20;2020-04-20;;VIR SEPA ENTRANT;;+24.00;0
+2020-04-21;2020-04-21;;CB ACHAT 1;;-63.43;0
+2020-04-22;2020-04-22;;CB ACHAT 2;;-63.11;0
+2020-04-27;2020-04-27;;PRLV Prlvt 1;;-20.0;0
+2020-05-15;2020-05-15;;CB ACHAT 3;;-7.32;0

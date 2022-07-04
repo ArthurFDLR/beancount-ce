@@ -1,4 +1,4 @@
-__version__ = '1.0.3'
+__version__ = '1.0.6'
 
 from .importer_csv import CEImporter_CSV
 from .importer_pdf import CEImporter_PDF

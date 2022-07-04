@@ -12,7 +12,7 @@ TEST_DATE = datetime.date(2020, 5, 15)
 
 
 def test_version():
-    assert __version__ == '1.0.3'
+    assert __version__ == '1.0.6'
 
 
 @pytest.fixture
@@ -50,44 +50,44 @@ def test_extract(importer, filename):
         {
             'date': datetime.date(2020, 4, 17),
             'amount': Decimal('-14.90'),
-            'payee': '* OP DEBIT BANQUE',
+            'payee': '* OP DEBIT BANQUE []',
         },
         {
             'date': datetime.date(2020, 4, 17),
             'amount': Decimal('4.40'),
-            'payee': '* OP CREDIT BANQUE',
+            'payee': '* OP CREDIT BANQUE []',
         },
         {
             'date': datetime.date(2020, 4, 20),
             'amount': Decimal('24.00'),
-            'payee': 'VIR SEPA ENTRANT',
+            'payee': 'VIR SEPA ENTRANT []',
         },
         {
             'date': datetime.date(2020, 4, 21),
             'amount': Decimal('-63.43'),
-            'payee': 'CB ACHAT 1',
+            'payee': 'CB ACHAT 1 []',
         },
         {
             'date': datetime.date(2020, 4, 22),
             'amount': Decimal('-63.11'),
-            'payee': 'CB ACHAT 2',
+            'payee': 'CB ACHAT 2 []',
         },
         {
             'date': datetime.date(2020, 4, 27),
             'amount': Decimal('-20.00'),
-            'payee': 'PRLV Prlvt 1',
+            'payee': 'PRLV Prlvt 1 []',
         },
         {
             'date': datetime.date(2020, 5, 15),
             'amount': Decimal('-7.32'),
-            'payee': 'CB ACHAT 3',
+            'payee': 'CB ACHAT 3 []',
         },
     ]
     op_name_test = [op_test['payee'] for op_test in operations_test]
 
     assert len(operations) == len(operations_test)
 
-    for op in enumerate(operations):
+    for op in operations:
 
         assert op.payee in op_name_test, 'Missing operation'
         op_test = operations_test[op_name_test.index(op.payee)]

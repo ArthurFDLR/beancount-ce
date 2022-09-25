@@ -12,7 +12,7 @@ TEST_DATE = datetime.date(2020, 5, 15)
 
 
 def test_version():
-    assert __version__ == '1.0.6'
+    assert __version__ == '1.0.7'
 
 
 @pytest.fixture
@@ -30,13 +30,6 @@ def test_identify(importer, filename):
         assert importer.identify(fd)
 
 
-# def test_identify_with_wrong_iban(filename):
-#     with open(filename) as fd:
-#         assert not CEImporter(
-#             "FR76 XXXX XXXX XXXX XXXX XXXX XXX", 'Assets:CE'
-#         ).identify(fd), 'File not skipped'
-
-
 def test_file_date(importer, filename):
     with open(filename) as fd:
         assert importer.file_date(fd) == TEST_DATE
@@ -50,37 +43,37 @@ def test_extract(importer, filename):
         {
             'date': datetime.date(2020, 4, 17),
             'amount': Decimal('-14.90'),
-            'payee': '* OP DEBIT BANQUE []',
+            'payee': '* OP DEBIT BANQUE [Deb]',
         },
         {
             'date': datetime.date(2020, 4, 17),
             'amount': Decimal('4.40'),
-            'payee': '* OP CREDIT BANQUE []',
+            'payee': '* OP CREDIT BANQUE [Cre]',
         },
         {
             'date': datetime.date(2020, 4, 20),
             'amount': Decimal('24.00'),
-            'payee': 'VIR SEPA ENTRANT []',
+            'payee': 'VIR SEPA ENTRANT',
         },
         {
             'date': datetime.date(2020, 4, 21),
             'amount': Decimal('-63.43'),
-            'payee': 'CB ACHAT 1 []',
+            'payee': 'CB ACHAT 1',
         },
         {
             'date': datetime.date(2020, 4, 22),
             'amount': Decimal('-63.11'),
-            'payee': 'CB ACHAT 2 []',
+            'payee': 'CB ACHAT 2',
         },
         {
             'date': datetime.date(2020, 4, 27),
             'amount': Decimal('-20.00'),
-            'payee': 'PRLV Prlvt 1 []',
+            'payee': 'PRLV Prlvt 1',
         },
         {
             'date': datetime.date(2020, 5, 15),
             'amount': Decimal('-7.32'),
-            'payee': 'CB ACHAT 3 []',
+            'payee': 'CB ACHAT 3',
         },
     ]
     op_name_test = [op_test['payee'] for op_test in operations_test]
@@ -88,7 +81,6 @@ def test_extract(importer, filename):
     assert len(operations) == len(operations_test)
 
     for op in operations:
-
         assert op.payee in op_name_test, 'Missing operation'
         op_test = operations_test[op_name_test.index(op.payee)]
 

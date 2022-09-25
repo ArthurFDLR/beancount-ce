@@ -7,6 +7,20 @@ from beancount.core.amount import Amount
 from beancount.core.number import Decimal
 from beancount.ingest import importer
 
+CSV_DELIMITER = ';'
+
+
+def get_date(s_date):
+    date_patterns = ["%d-%m-%Y", "%Y-%m-%d", "%Y/%m/%d", '%m/%d/%Y']
+
+    for pattern in date_patterns:
+        try:
+            return datetime.strptime(s_date, pattern).date()
+        except:
+            pass
+
+    return None
+
 
 class CEImporter_CSV(importer.ImporterProtocol):
     """Beancount Importer for Caisse d'Epargne CSV statement exports.
@@ -44,16 +58,17 @@ class CEImporter_CSV(importer.ImporterProtocol):
             return None
         date = None
         with open(file_.name) as fd:
-            # for _ in range(4):
-            #     next(fd)
             reader = csv.DictReader(
-                fd, delimiter=';', quoting=csv.QUOTE_MINIMAL, quotechar='"'
+                fd,
+                delimiter=CSV_DELIMITER,
+                quoting=csv.QUOTE_MINIMAL,
+                quotechar='"',
             )
             for line in reader:
                 try:
-                    date_tmp = datetime.strptime(
-                        line["Date operation"], '%Y-%m-%d'
-                    ).date()
+                    date_tmp = get_date(line["Date de comptabilisation"])
+                    if date_tmp is None:
+                        raise RuntimeError("Wrong date format")
                 except Exception as e:
                     print(e)
                     break
@@ -65,35 +80,27 @@ class CEImporter_CSV(importer.ImporterProtocol):
         return 'CaisseEpargne_Statement.csv'
 
     def is_valid_header(self, line: str) -> bool:
-        # expected_values = [
-        #     "Date",
-        #     "Numéro d'opération",
-        #     "Libellé",
-        #     "Débit",
-        #     "Crédit",
-        #     "Détail",
-        # ]
-        expected_values = [
-            "Date operation",
-            "Date de comptabilisation",
-            "Categorie operation",
-            "Libelle operation",
-            "Libelle simplifie",
-            "Montant operation",
-            "Pointage operation",
-        ]
-        actual_values = [column.strip('\n') for column in line.split(';')]
-        for (expected, actual) in zip(expected_values, actual_values):
-            if expected != actual:
-                return False
-        return True
+        expected_values = set(
+            [
+                "Date operation",
+                "Libelle operation",
+                "Libelle simplifie",
+                "Debit",
+                "Credit",
+            ]
+        )
+        actual_values = set(
+            column.strip('\n') for column in line.split(CSV_DELIMITER)
+        )
+        return expected_values.issubset(actual_values)
 
     def is_valid_account_number_line(self, line: str) -> bool:
         if not self.iban:
             return True
         try:
             [account_number_key, account_number] = [
-                token.strip() for token in line.split(';')[0].split(':')
+                token.strip()
+                for token in line.split(CSV_DELIMITER)[0].split(':')
             ]
             return account_number_key == "Numéro de compte" and account_number.replace(
                 ' ', ''
@@ -124,21 +131,26 @@ class CEImporter_CSV(importer.ImporterProtocol):
             return []
 
         with open(file_.name) as fd:
-            # for _ in range(4):
-            #     next(fd)
             reader = csv.DictReader(
-                fd, delimiter=';', quoting=csv.QUOTE_MINIMAL, quotechar='"'
+                fd,
+                delimiter=CSV_DELIMITER,
+                quoting=csv.QUOTE_MINIMAL,
+                quotechar='"',
             )
             for index, line in enumerate(reader):
                 meta = data.new_metadata(file_.name, index)
                 postings = []
                 try:
-                    date = datetime.strptime(
-                        line["Date operation"], '%Y-%m-%d'
-                    ).date()
+                    date = get_date(line["Date de comptabilisation"])
+                    if date is None:
+                        raise RuntimeError("Wrong date format")
                 except:
                     break
-                amount = Decimal(line["Montant operation"].replace(',', '.'))
+                amount = (
+                    Decimal(line["Debit"].replace(',', '.'))
+                    if line["Debit"]
+                    else Decimal(line["Credit"].replace(',', '.'))
+                )
                 postings.append(
                     data.Posting(
                         self.account,
@@ -173,15 +185,15 @@ class CEImporter_CSV(importer.ImporterProtocol):
                                 None,
                             )
                         )
+                payee = line["Libelle operation"]
+                if line["Libelle simplifie"]:
+                    payee += f" [{line['Libelle simplifie']}]"
                 entries.append(
                     data.Transaction(
                         meta,
                         date,
                         self.FLAG,
-                        line["Libelle operation"]
-                        + " ["
-                        + line["Libelle simplifie"]
-                        + "]",
+                        payee,
                         '',
                         data.EMPTY_SET,
                         data.EMPTY_SET,

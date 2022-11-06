@@ -10,8 +10,11 @@ from beancount.ingest import importer
 CSV_DELIMITER = ';'
 
 
-def get_date(s_date, pattern:str=''):
-    date_patterns = ["%Y/%m/%d", '%d/%m/%Y'] # '%d-%m-%Y', '%Y-%m-%d', '%m/%d/%Y', 
+def get_date(s_date, pattern: str = ''):
+    date_patterns = [
+        "%Y/%m/%d",
+        '%d/%m/%Y',
+    ]  # '%d-%m-%Y', '%Y-%m-%d', '%m/%d/%Y',
 
     if pattern:
         try:
@@ -45,7 +48,7 @@ class CEImporter_CSV(importer.ImporterProtocol):
         expenseCat: str = '',
         creditCat: str = '',
         iban: str = '',
-        enforced_date_template:str='',
+        enforced_date_template: str = '',
     ):
         self.account = account
         self.expenseCat = expenseCat
@@ -75,7 +78,10 @@ class CEImporter_CSV(importer.ImporterProtocol):
             )
             for line in reader:
                 try:
-                    date_tmp = get_date(line["Date de comptabilisation"], pattern=self.enforced_date_template)
+                    date_tmp = get_date(
+                        line["Date de comptabilisation"],
+                        pattern=self.enforced_date_template,
+                    )
                     if date_tmp is None:
                         raise RuntimeError("Wrong date format")
                 except Exception as e:
@@ -150,7 +156,10 @@ class CEImporter_CSV(importer.ImporterProtocol):
                 meta = data.new_metadata(file_.name, index)
                 postings = []
                 try:
-                    date = get_date(line["Date de comptabilisation"], pattern=self.enforced_date_template)
+                    date = get_date(
+                        line["Date de comptabilisation"],
+                        pattern=self.enforced_date_template,
+                    )
                     if date is None:
                         raise RuntimeError("Wrong date format")
                 except:

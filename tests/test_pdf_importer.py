@@ -12,7 +12,7 @@ TEST_DATE = datetime.date(2020, 5, 16)
 
 
 def test_version():
-    assert __version__ == '1.0.7'
+    assert __version__ == '1.1.0'
 
 
 @pytest.fixture
